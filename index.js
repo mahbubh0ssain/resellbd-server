@@ -90,10 +90,18 @@ app.get("/products/:id", async (req, res) => {
 const BookingCollection = client
   .db("Resell-BD")
   .collection("bookingCollection");
-
+// post all booking
 app.post("/bookings", async (req, res) => {
   const booking = req.body;
   const result = await BookingCollection.insertOne(booking);
+  res.send(result);
+});
+
+//get all bookings
+app.get("/bookings", async (req, res) => {
+  const email = req.query.email;
+  console.log(email);
+  const result = await BookingCollection.find({ buyerEmail: email }).toArray();
   res.send(result);
 });
 
