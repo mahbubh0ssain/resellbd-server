@@ -76,7 +76,6 @@ const ProductsCollection = client
 app.get("/products/:id", async (req, res) => {
   const { id } = req.params;
   const result = await ProductsCollection.find({ categoryId: id }).toArray();
-  console.log(result);
   res.send(result);
 });
 
@@ -86,6 +85,17 @@ app.get("/products/:id", async (req, res) => {
 //   const result = await ProductsCollection.findOne({ _id: ObjectId(id) });
 //   res.send(result);
 // });
+
+//booking collection
+const BookingCollection = client
+  .db("Resell-BD")
+  .collection("bookingCollection");
+
+app.post("/bookings", async (req, res) => {
+  const booking = req.body;
+  const result = await BookingCollection.insertOne(booking);
+  res.send(result);
+});
 
 app.listen(port, () => {
   console.log(`Final assignment server is running on port ${port}`);
