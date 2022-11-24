@@ -33,6 +33,7 @@ dbConnect();
 // userCollection
 const UsersCollection = client.db("Resell-BD").collection("usersCollection");
 
+//user saved to DB
 app.post("/createUser", async (req, res) => {
   try {
     const user = req.body;
@@ -60,6 +61,7 @@ app.post("/createUser", async (req, res) => {
 //category collection
 const Categories = client.db("Resell-BD").collection("categories");
 
+//get al category
 app.get("/category", async (req, res) => {
   const result = await Categories.find({}).toArray();
   res.send(result);
@@ -70,18 +72,20 @@ const ProductsCollection = client
   .db("Resell-BD")
   .collection("productsCollection");
 
-//all products
-app.get("/products", async (req, res) => {
-  const result = await ProductsCollection.find({}).toArray();
+//get all products
+app.get("/products/:id", async (req, res) => {
+  const { id } = req.params;
+  const result = await ProductsCollection.find({ categoryId: id }).toArray();
+  console.log(result);
   res.send(result);
 });
 
 //single product
-app.get("/products/:id", async (req, res) => {
-  const id = req.params;
-  const result = await ProductsCollection.findOne({ _id: ObjectId(id) });
-  res.send(result);
-});
+// app.get("/products/:id", async (req, res) => {
+//   const id = req.params;
+//   const result = await ProductsCollection.findOne({ _id: ObjectId(id) });
+//   res.send(result);
+// });
 
 app.listen(port, () => {
   console.log(`Final assignment server is running on port ${port}`);
