@@ -33,8 +33,29 @@ dbConnect();
 // userCollection
 const UsersCollection = client.db("Resell-BD").collection("usersCollection");
 
-
-
+app.post("/createUser", async (req, res) => {
+  try {
+    const user = req.body;
+    const result = await UsersCollection.insertOne(user);
+    if (result) {
+      res.send({
+        success: true,
+        data: result,
+      });
+    } else {
+      res.send({
+        success: false,
+        message: "Data not found",
+      });
+    }
+  } catch (err) {
+    res.send({
+      success: false,
+      message: err.message,
+    });
+    console.error(err);
+  }
+});
 
 app.listen(port, () => {
   console.log(`Final assignment server is running on port ${port}`);
