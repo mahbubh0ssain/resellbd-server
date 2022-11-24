@@ -12,7 +12,7 @@ app.get("/", (req, res) => {
 });
 
 //mongoDB
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@resell-bd.6rcesuv.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, {
   useNewUrlParser: true,
@@ -55,6 +55,32 @@ app.post("/createUser", async (req, res) => {
     });
     console.error(err);
   }
+});
+
+//category collection
+const Categories = client.db("Resell-BD").collection("categories");
+
+app.get("/category", async (req, res) => {
+  const result = await Categories.find({}).toArray();
+  res.send(result);
+});
+
+// productsCollection
+const ProductsCollection = client
+  .db("Resell-BD")
+  .collection("productsCollection");
+
+//all products
+app.get("/products", async (req, res) => {
+  const result = await ProductsCollection.find({}).toArray();
+  res.send(result);
+});
+
+//single product
+app.get("/products/:id", async (req, res) => {
+  const id = req.params;
+  const result = await ProductsCollection.findOne({ _id: ObjectId(id) });
+  res.send(result);
 });
 
 app.listen(port, () => {

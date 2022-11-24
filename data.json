@@ -1,0 +1,77 @@
+[
+  {
+    "ctgName": "Bedroom",
+    "products": [
+      {
+        "name": "Bed",
+        "img": "https://i.ibb.co/nn6b9cT/279324569-3232232883765159-5642116542330844836-n-1500x.jpg",
+        "original-price": 12000,
+        "price": 8900,
+        "years-use": 2,
+        "posted-at": "24, Nov, 2022",
+        "seller-name": "Mahbub",
+        "verified": false
+      },
+      {
+        "name": "Sofa",
+        "img": "https://i.ibb.co/pJY6Zb0/modern-furniture-godfrey-sofa-splatter-barcelona-lamp-full-spr15-jonathan-adler-1548370799.jpg",
+        "original-price": 123,
+        "price": 12,
+        "years-use": 2,
+        "posted-at": "24, Nov, 2022",
+        "seller-name": "Mahbub",
+        "verified": false
+      }
+    ]
+  },
+  {
+    "ctgName": "kitchen",
+    "products": [
+      {
+        "name": "Cabinet",
+        "img": "https://i.ibb.co/YW82kPd/austin.jpg",
+        "original-price": 123,
+        "price": 12,
+        "years-use": 2,
+        "posted-at": "24, Nov, 2022",
+        "seller-name": "Mahbub",
+        "verified": false
+      },
+      {
+        "name": "Cabinet Cupboard",
+        "img": "lihttps://i.ibb.co/ys1nr5p/s-l400.jpgnk",
+        "original-price": 123,
+        "price": 12,
+        "years-use": 2,
+        "posted-at": "24, Nov, 2022",
+        "seller-name": "Mahbub",
+        "verified": false
+      }
+    ]
+  },
+  {
+    "ctgName": "Dining",
+    "products": [
+      {
+        "name": "Dining Table",
+        "img": "https://i.ibb.co/8m8bGV2/99276.jpg",
+        "original-price": 123,
+        "price": 12,
+        "years-use": 2,
+        "posted-at": "24, Nov, 2022",
+        "seller-name": "Mahbub",
+        "verified": false
+      },
+      {
+        "name": "1Dining Chair",
+        "img": "https://i.ibb.co/HYKCq74/maxresdefault.jpg",
+        "original-price": 123,
+        "price": 12,
+        "years-use": 2,
+        "posted-at": "24, Nov, 2022",
+        "seller-name": "Mahbub",
+        "verified": false
+      }
+    ]
+  }
+]
