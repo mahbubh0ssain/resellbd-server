@@ -1,10 +1,12 @@
 const express = require("express");
 const app = express();
+var jwt = require("jsonwebtoken");
 const cors = require("cors");
-// const jwt = require(" jsonwebtoken ");
 const port = process.env.PORT || 5000;
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+
 app.use(cors());
 app.use(express.json());
 
@@ -113,12 +115,11 @@ app.get("/dashboard/payment/:id", async (req, res) => {
   const id = req.params.id;
   const result = await BookingCollection.findOne({ _id: ObjectId(id) });
   res.send(result);
-  console.log(result);
 });
 
 //stripe payment
 app.post("/create-payment-intent", async (req, res) => {
-  const { price } = req.body;
+  const price = req.body.productPrice;
   const amount = price * 100;
   const paymentIntent = await stripe.paymentIntents.create({
     amount,
@@ -130,6 +131,16 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 });
 
+//sign token
+app.get("/jwt", async (req, res) => {
+  const email = req.query.email;
+  const isExist = await UsersCollection.findOne({ email: email });
+  if (isExist) {
+    const token = jwt.sign({ email }, process.env.ACCESS_TOKEN);
+    return res.send({ token });
+  }
+  return res.status(401).send({ message: "Access forbidden" });
+});
 
 app.listen(port, () => {
   console.log(`Final assignment server is running on port ${port}`);
