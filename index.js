@@ -90,6 +90,7 @@ app.get("/products/:id", async (req, res) => {
 const BookingCollection = client
   .db("Resell-BD")
   .collection("bookingCollection");
+
 // post all booking
 app.post("/bookings", async (req, res) => {
   const booking = req.body;
@@ -101,7 +102,10 @@ app.post("/bookings", async (req, res) => {
 app.get("/bookings", async (req, res) => {
   const email = req.query.email;
   console.log(email);
-  const result = await BookingCollection.find({ buyerEmail: email }).toArray();
+  const result = await BookingCollection.find({
+    buyerEmail: email,
+  }).toArray();
+  console.log(result);
   res.send(result);
 });
 
