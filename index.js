@@ -131,6 +131,28 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 });
 
+//payment collection
+const PaymentsCollection = client
+  .db("Resell-BD")
+  .collection("paymentsCollection");
+
+//payment info from client
+app.post("/paymentInfo", async (req, res) => {
+  const paymentInfo = req.body;
+  const id = paymentInfo._id;
+  const result = await PaymentsCollection.insertOne(paymentInfo);
+  const update = {
+    $set: { paid: true },
+  };
+  const updatebooking = await BookingCollection.updateOne(
+    {
+      _id: ObjectId(id),
+    },
+    update
+  );
+  res.send(result);
+});
+
 //sign token
 app.get("/jwt", async (req, res) => {
   const email = req.query.email;
