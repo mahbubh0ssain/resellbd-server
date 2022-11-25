@@ -1,8 +1,9 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+// const jwt = require(" jsonwebtoken ");
 const port = process.env.PORT || 5000;
-
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 require("dotenv").config();
 app.use(cors());
 app.use(express.json());
@@ -101,13 +102,34 @@ app.post("/bookings", async (req, res) => {
 //get all bookings
 app.get("/bookings", async (req, res) => {
   const email = req.query.email;
-  console.log(email);
   const result = await BookingCollection.find({
     buyerEmail: email,
   }).toArray();
-  console.log(result);
   res.send(result);
 });
+
+//get single booking\
+app.get("/dashboard/payment/:id", async (req, res) => {
+  const id = req.params.id;
+  const result = await BookingCollection.findOne({ _id: ObjectId(id) });
+  res.send(result);
+  console.log(result);
+});
+
+//stripe payment
+app.post("/create-payment-intent", async (req, res) => {
+  const { price } = req.body;
+  const amount = price * 100;
+  const paymentIntent = await stripe.paymentIntents.create({
+    amount,
+    currency: "usd",
+    payment_method_types: ["card"],
+  });
+  res.send({
+    clientSecret: paymentIntent.client_secret,
+  });
+});
+
 
 app.listen(port, () => {
   console.log(`Final assignment server is running on port ${port}`);
