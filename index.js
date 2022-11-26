@@ -82,6 +82,14 @@ app.get("/products/:id", async (req, res) => {
   res.send(result);
 });
 
+//add product
+
+app.post("/add-product", async (req, res) => {
+  const product = req.body;
+  const result = await ProductsCollection.insertOne(product);
+  res.send(result);
+});
+
 //single product
 // app.get("/products/:id", async (req, res) => {
 //   const id = req.params;
