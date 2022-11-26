@@ -79,7 +79,13 @@ app.post("/verify-seller", async (req, res) => {
   const result = await UsersCollection.updateOne({ email: email }, update, {
     upsert: true,
   });
+  res.send(result);
+});
 
+//delete seller
+app.post("/delete-seller", async (req, res) => {
+  const email = req.query.email;
+  const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
 });
 
