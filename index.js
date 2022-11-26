@@ -60,7 +60,7 @@ app.post("/createUser", async (req, res) => {
     console.error(err);
   }
 });
-
+// all sellers
 app.get("/all-sellers", async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "seller" }).toArray();
@@ -70,6 +70,20 @@ app.get("/all-sellers", async (req, res) => {
   }
 });
 
+//verify seller
+app.post("/verify-seller", async (req, res) => {
+  const email = req.query.email;
+  const update = {
+    $set: { verified: true },
+  };
+  const result = await UsersCollection.updateOne({ email: email }, update, {
+    upsert: true,
+  });
+
+  res.send(result);
+});
+
+// all buyers
 app.get("/all-buyers", async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "buyer" }).toArray();
