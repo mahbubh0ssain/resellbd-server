@@ -99,6 +99,13 @@ app.get("/all-buyers", async (req, res) => {
   }
 });
 
+//delete buyer
+app.post("/delete-buyer", async (req, res) => {
+  const email = req.query.email;
+  const result = await UsersCollection.deleteOne({ email: email });
+  res.send(result);
+});
+
 //category collection
 const Categories = client.db("Resell-BD").collection("categories");
 
