@@ -33,6 +33,69 @@ const dbConnect = async () => {
 };
 dbConnect();
 
+//sign token
+app.get("/jwt", async (req, res) => {
+  const email = req.query.email;
+  const isExist = await UsersCollection.findOne({ email: email });
+  if (isExist) {
+    const token = jwt.sign({ email }, process.env.ACCESS_TOKEN);
+    return res.send({ token });
+  }
+  return res.status(401).send({ message: "Access forbidden" });
+});
+
+// verify JWT
+const verifyJWT = (req, res, next) => {
+  const headerToken = req.headers.authorization;
+  if (!headerToken) {
+    return res.status(401).send({ message: "Unauthorized access" });
+  }
+  const token = headerToken.split(" ")[1];
+  jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+    if (err) {
+      return res.status(403).send({ message: "Access forbidden" });
+    }
+    req.decoded = decoded;
+    next();
+  });
+};
+
+//get admin from DB
+app.get("/admin", async (req, res) => {
+  const email = req.query.email;
+  if (!email) {
+    return res.status(403).send({ message: "Access forbidden" });
+  }
+  const result = await UsersCollection.findOne({ email: email });
+  if (result) {
+    res.send(result);
+  }
+});
+
+//get seller from DB
+app.get("/seller", async (req, res) => {
+  const email = req.query.email;
+  if (!email) {
+    return res.status(403).send({ message: "Access forbidden" });
+  }
+  const result = await UsersCollection.findOne({ email: email });
+  if (result) {
+    res.send(result);
+  }
+});
+
+//get buyer from DB
+app.get("/buyer", async (req, res) => {
+  const email = req.query.email;
+  if (!email) {
+    return res.status(403).send({ message: "Access forbidden" });
+  }
+  const result = await UsersCollection.findOne({ email: email });
+  if (result) {
+    res.send(result);
+  }
+});
+
 // userCollection
 const UsersCollection = client.db("Resell-BD").collection("usersCollection");
 
@@ -60,8 +123,9 @@ app.post("/createUser", async (req, res) => {
     console.error(err);
   }
 });
+
 // all sellers
-app.get("/all-sellers", async (req, res) => {
+app.get("/all-sellers", verifyJWT, async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "seller" }).toArray();
     res.send(result);
@@ -71,7 +135,7 @@ app.get("/all-sellers", async (req, res) => {
 });
 
 //verify seller
-app.post("/verify-seller", async (req, res) => {
+app.post("/verify-seller", verifyJWT, async (req, res) => {
   const email = req.query.email;
   const update = {
     $set: { verified: true },
@@ -83,14 +147,14 @@ app.post("/verify-seller", async (req, res) => {
 });
 
 //delete seller
-app.post("/delete-seller", async (req, res) => {
+app.post("/delete-seller", verifyJWT, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
 });
 
 // all buyers
-app.get("/all-buyers", async (req, res) => {
+app.get("/all-buyers", verifyJWT, async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "buyer" }).toArray();
     res.send(result);
@@ -100,7 +164,7 @@ app.get("/all-buyers", async (req, res) => {
 });
 
 //delete buyer
-app.post("/delete-buyer", async (req, res) => {
+app.post("/delete-buyer", verifyJWT, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
@@ -128,17 +192,19 @@ app.get("/products/:id", async (req, res) => {
 });
 
 //add product
-
-app.post("/add-product", async (req, res) => {
+app.post("/add-product", verifyJWT, async (req, res) => {
   const product = req.body;
   const result = await ProductsCollection.insertOne(product);
   res.send(result);
 });
 
 //product by email for seller
-app.get("/my-products", async (req, res) => {
+app.get("/my-products", verifyJWT, async (req, res) => {
   const email = req.query.email;
-  console.log(email);
+  const decodedEmail = req.decoded.email;
+  if (email !== decodedEmail) {
+    res.status(403).send({ message: "Access forbidden" });
+  }
   const result = await ProductsCollection.find({
     sellerEmail: email,
   }).toArray();
@@ -158,8 +224,14 @@ app.post("/bookings", async (req, res) => {
 });
 
 //get all bookings
-app.get("/bookings", async (req, res) => {
+app.get("/bookings", verifyJWT, async (req, res) => {
   const email = req.query.email;
+  const decodedEmail = req.decoded.email;
+  console.log("disi mail", email, "decode mail", decodedEmail);
+
+  if (email !== decodedEmail) {
+    return res.status(403).send({ message: "Access forb" });
+  }
   const result = await BookingCollection.find({
     buyerEmail: email,
   }).toArray();
@@ -207,17 +279,6 @@ app.post("/paymentInfo", async (req, res) => {
     update
   );
   res.send(result);
-});
-
-//sign token
-app.get("/jwt", async (req, res) => {
-  const email = req.query.email;
-  const isExist = await UsersCollection.findOne({ email: email });
-  if (isExist) {
-    const token = jwt.sign({ email }, process.env.ACCESS_TOKEN);
-    return res.send({ token });
-  }
-  return res.status(401).send({ message: "Access forbidden" });
 });
 
 app.listen(port, () => {
