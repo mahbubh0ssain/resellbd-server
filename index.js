@@ -90,12 +90,15 @@ app.post("/add-product", async (req, res) => {
   res.send(result);
 });
 
-//single product
-// app.get("/products/:id", async (req, res) => {
-//   const id = req.params;
-//   const result = await ProductsCollection.findOne({ _id: ObjectId(id) });
-//   res.send(result);
-// });
+//product by email for seller
+app.get("/my-products", async (req, res) => {
+  const email = req.query.email;
+  console.log(email);
+  const result = await ProductsCollection.find({
+    sellerEmail: email,
+  }).toArray();
+  res.send(result);
+});
 
 //booking collection
 const BookingCollection = client
