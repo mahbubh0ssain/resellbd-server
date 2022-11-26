@@ -36,7 +36,7 @@ dbConnect();
 // userCollection
 const UsersCollection = client.db("Resell-BD").collection("usersCollection");
 
-//user saved to DB
+//save user  to DB
 app.post("/createUser", async (req, res) => {
   try {
     const user = req.body;
@@ -58,6 +58,24 @@ app.post("/createUser", async (req, res) => {
       message: err.message,
     });
     console.error(err);
+  }
+});
+
+app.get("/all-sellers", async (req, res) => {
+  try {
+    const result = await UsersCollection.find({ role: "seller" }).toArray();
+    res.send(result);
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+app.get("/all-buyers", async (req, res) => {
+  try {
+    const result = await UsersCollection.find({ role: "buyer" }).toArray();
+    res.send(result);
+  } catch (err) {
+    console.log(err);
   }
 });
 
