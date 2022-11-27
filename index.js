@@ -298,16 +298,12 @@ app.post("/paymentInfo", async (req, res) => {
     upsert: true,
   });
 
-  const updateAdvertise = await AdvertiseCollection.updateOne(
-    { id: id },
-    { $set: { status: "sold" } }
-  );
+  const updateAdvertise = await AdvertiseCollection.deleteOne({ id: id });
 
   const updateStatus = await ProductsCollection.updateOne(
     { _id: ObjectId(id) },
     { $set: { status: "sold" } }
   );
-
   res.send(result);
 });
 
@@ -315,6 +311,12 @@ app.post("/paymentInfo", async (req, res) => {
 app.post("/advertise", verifyJWT, async (req, res) => {
   const content = req.body;
   const result = await AdvertiseCollection.insertOne(content);
+  res.send(result);
+});
+
+// get advertise
+app.get("/advertise", async (req, res) => {
+  const result = await AdvertiseCollection.find({}).toArray();
   res.send(result);
 });
 
