@@ -33,6 +33,29 @@ const dbConnect = async () => {
 };
 dbConnect();
 
+// userCollection
+const UsersCollection = client.db("Resell-BD").collection("usersCollection");
+
+// productsCollection
+const ProductsCollection = client
+  .db("Resell-BD")
+  .collection("productsCollection");
+
+//booking collection
+const BookingCollection = client
+  .db("Resell-BD")
+  .collection("bookingCollection");
+
+//payment collection
+const PaymentsCollection = client
+  .db("Resell-BD")
+  .collection("paymentsCollection");
+
+//advertise collection
+const AdvertiseCollection = client
+  .db("Resell-BD")
+  .collection("advertiseCollection");
+
 //sign token
 app.get("/jwt", async (req, res) => {
   const email = req.query.email;
@@ -106,9 +129,6 @@ app.get("/buyer", async (req, res) => {
   }
 });
 
-// userCollection
-const UsersCollection = client.db("Resell-BD").collection("usersCollection");
-
 //save user  to DB
 app.post("/createUser", async (req, res) => {
   try {
@@ -157,7 +177,7 @@ app.post("/verify-seller", verifyJWT, verifyAdmin, async (req, res) => {
 });
 
 //delete seller
-app.post("/delete-seller", verifyJWT, verifyAdmin, async (req, res) => {
+app.delete("/delete-seller", verifyJWT, verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
@@ -174,7 +194,7 @@ app.get("/all-buyers", verifyJWT, verifyAdmin, async (req, res) => {
 });
 
 //delete buyer
-app.post("/delete-buyer", verifyJWT, verifyAdmin, async (req, res) => {
+app.delete("/delete-buyer", verifyJWT, verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
@@ -188,11 +208,6 @@ app.get("/category", async (req, res) => {
   const result = await Categories.find({}).toArray();
   res.send(result);
 });
-
-// productsCollection
-const ProductsCollection = client
-  .db("Resell-BD")
-  .collection("productsCollection");
 
 //get all products
 app.get("/products/:id", async (req, res) => {
@@ -227,11 +242,6 @@ app.delete("/delete-product", verifyJWT, async (req, res) => {
   const result = await ProductsCollection.deleteOne({ _id: ObjectId(id) });
   res.send(result);
 });
-
-//booking collection
-const BookingCollection = client
-  .db("Resell-BD")
-  .collection("bookingCollection");
 
 // post all booking
 app.post("/bookings", async (req, res) => {
@@ -274,26 +284,37 @@ app.post("/create-payment-intent", async (req, res) => {
   });
 });
 
-//payment collection
-const PaymentsCollection = client
-  .db("Resell-BD")
-  .collection("paymentsCollection");
-
 //payment info from client
 app.post("/paymentInfo", async (req, res) => {
   const paymentInfo = req.body;
   const id = paymentInfo.id;
   const result = await PaymentsCollection.insertOne(paymentInfo);
+
   const update = {
     $set: { paid: true },
   };
+
   const updatebooking = await BookingCollection.updateOne({ id: id }, update, {
     upsert: true,
   });
+
+  const updateAdvertise = await AdvertiseCollection.updateOne(
+    { id: id },
+    { $set: { status: "sold" } }
+  );
+
   const updateStatus = await ProductsCollection.updateOne(
     { _id: ObjectId(id) },
     { $set: { status: "sold" } }
   );
+
+  res.send(result);
+});
+
+//post advertise
+app.post("/advertise", verifyJWT, async (req, res) => {
+  const content = req.body;
+  const result = await AdvertiseCollection.insertOne(content);
   res.send(result);
 });
 
