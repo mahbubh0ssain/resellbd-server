@@ -246,6 +246,10 @@ app.post("/add-product", verifyJWT, async (req, res) => {
 
   const isVerified = await UsersCollection.findOne({ email: email });
 
+  if (isVerified.verified) {
+    product.verified = true;
+  }
+
   const result = await ProductsCollection.insertOne(product);
   res.send(result);
 });
@@ -290,7 +294,11 @@ app.get("/my-products", verifyJWT, async (req, res) => {
 //delete product by seller
 app.delete("/delete-product", verifyJWT, async (req, res) => {
   const id = req.query.id;
+
   const result = await ProductsCollection.deleteOne({ _id: ObjectId(id) });
+
+  const deleteFromAdvertise = await AdvertiseCollection.deleteOne({ id: id });
+
   res.send(result);
 });
 
