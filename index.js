@@ -221,6 +221,13 @@ app.get("/my-products", verifyJWT, async (req, res) => {
   res.send(result);
 });
 
+//delete product by seller
+app.delete("/delete-product", verifyJWT, async (req, res) => {
+  const id = req.query.id;
+  const result = await ProductsCollection.deleteOne({ _id: ObjectId(id) });
+  res.send(result);
+});
+
 //booking collection
 const BookingCollection = client
   .db("Resell-BD")
