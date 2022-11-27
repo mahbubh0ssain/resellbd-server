@@ -56,6 +56,11 @@ const AdvertiseCollection = client
   .db("Resell-BD")
   .collection("advertiseCollection");
 
+//advertise collection
+const ReportedItemsCollection = client
+  .db("Resell-BD")
+  .collection("reportedItemsCollection");
+
 //sign token
 app.get("/jwt", async (req, res) => {
   const email = req.query.email;
@@ -219,10 +224,38 @@ app.get("/products/:id", async (req, res) => {
 //add product
 app.post("/add-product", verifyJWT, async (req, res) => {
   const product = req.body;
+  const email = product.sellerEmail;
+
+  const isVerified = await UsersCollection.findOne({ email: email });
+
   const result = await ProductsCollection.insertOne(product);
   res.send(result);
 });
 
+//post reported items
+app.post("/reported-items", async (req, res) => {
+  const item = req.body;
+  const result = await ReportedItemsCollection.insertOne(item);
+  res.send(result);
+});
+
+//get reported items
+app.get("/reported-items", async (req, res) => {
+  const result = await ReportedItemsCollection.find({}).toArray();
+  res.send(result);
+});
+
+// delete report item
+app.delete("/delete-report", verifyJWT, verifyAdmin, async (req, res) => {
+  const id = req.query.id;
+  const result = await ReportedItemsCollection.deleteOne({ id: id });
+  
+  const deleteFromProductCollection = await ProductsCollection.deleteOne({
+    _id: ObjectId(id),
+  });
+
+  res.send(result);
+});
 //product by email for seller
 app.get("/my-products", verifyJWT, async (req, res) => {
   const email = req.query.email;
