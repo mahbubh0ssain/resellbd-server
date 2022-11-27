@@ -135,7 +135,7 @@ app.post("/createUser", async (req, res) => {
 });
 
 // all sellers
-app.get("/all-sellers", verifyJWT,verifyAdmin, async (req, res) => {
+app.get("/all-sellers", verifyJWT, verifyAdmin, async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "seller" }).toArray();
     res.send(result);
@@ -145,7 +145,7 @@ app.get("/all-sellers", verifyJWT,verifyAdmin, async (req, res) => {
 });
 
 //verify seller
-app.post("/verify-seller", verifyJWT,verifyAdmin, async (req, res) => {
+app.post("/verify-seller", verifyJWT, verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const update = {
     $set: { verified: true },
@@ -157,7 +157,7 @@ app.post("/verify-seller", verifyJWT,verifyAdmin, async (req, res) => {
 });
 
 //delete seller
-app.post("/delete-seller", verifyJWT,verifyAdmin, async (req, res) => {
+app.post("/delete-seller", verifyJWT, verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
@@ -237,8 +237,6 @@ app.post("/bookings", async (req, res) => {
 app.get("/bookings", verifyJWT, async (req, res) => {
   const email = req.query.email;
   const decodedEmail = req.decoded.email;
-  console.log("disi mail", email, "decode mail", decodedEmail);
-
   if (email !== decodedEmail) {
     return res.status(403).send({ message: "Access forb" });
   }
@@ -251,7 +249,7 @@ app.get("/bookings", verifyJWT, async (req, res) => {
 //get single booking\
 app.get("/dashboard/payment/:id", async (req, res) => {
   const id = req.params.id;
-  const result = await BookingCollection.findOne({ _id: ObjectId(id) });
+  const result = await BookingCollection.findOne({ id: id });
   res.send(result);
 });
 
@@ -277,16 +275,17 @@ const PaymentsCollection = client
 //payment info from client
 app.post("/paymentInfo", async (req, res) => {
   const paymentInfo = req.body;
-  const id = paymentInfo._id;
+  const id = paymentInfo.id;
   const result = await PaymentsCollection.insertOne(paymentInfo);
   const update = {
     $set: { paid: true },
   };
-  const updatebooking = await BookingCollection.updateOne(
-    {
-      _id: ObjectId(id),
-    },
-    update
+  const updatebooking = await BookingCollection.updateOne({ id: id }, update, {
+    upsert: true,
+  });
+  const updateStatus = await ProductsCollection.updateOne(
+    { _id: ObjectId(id) },
+    { $set: { status: "sold" } }
   );
   res.send(result);
 });
