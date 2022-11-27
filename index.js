@@ -60,6 +60,16 @@ const verifyJWT = (req, res, next) => {
   });
 };
 
+//verifyAdmin
+const verifyAdmin = async (req, res, next) => {
+  const decodedEmail = req.decoded.email;
+  const user = await UsersCollection.findOne({ email: decodedEmail });
+  if (!user.admin) {
+    return res.status(403).send({ message: "Access forbidden" });
+  }
+  next();
+};
+
 //get admin from DB
 app.get("/admin", async (req, res) => {
   const email = req.query.email;
@@ -125,7 +135,7 @@ app.post("/createUser", async (req, res) => {
 });
 
 // all sellers
-app.get("/all-sellers", verifyJWT, async (req, res) => {
+app.get("/all-sellers", verifyJWT,verifyAdmin, async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "seller" }).toArray();
     res.send(result);
@@ -135,7 +145,7 @@ app.get("/all-sellers", verifyJWT, async (req, res) => {
 });
 
 //verify seller
-app.post("/verify-seller", verifyJWT, async (req, res) => {
+app.post("/verify-seller", verifyJWT,verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const update = {
     $set: { verified: true },
@@ -147,14 +157,14 @@ app.post("/verify-seller", verifyJWT, async (req, res) => {
 });
 
 //delete seller
-app.post("/delete-seller", verifyJWT, async (req, res) => {
+app.post("/delete-seller", verifyJWT,verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
 });
 
 // all buyers
-app.get("/all-buyers", verifyJWT, async (req, res) => {
+app.get("/all-buyers", verifyJWT, verifyAdmin, async (req, res) => {
   try {
     const result = await UsersCollection.find({ role: "buyer" }).toArray();
     res.send(result);
@@ -164,7 +174,7 @@ app.get("/all-buyers", verifyJWT, async (req, res) => {
 });
 
 //delete buyer
-app.post("/delete-buyer", verifyJWT, async (req, res) => {
+app.post("/delete-buyer", verifyJWT, verifyAdmin, async (req, res) => {
   const email = req.query.email;
   const result = await UsersCollection.deleteOne({ email: email });
   res.send(result);
