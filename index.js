@@ -172,12 +172,30 @@ app.get("/all-sellers", verifyJWT, verifyAdmin, async (req, res) => {
 //verify seller
 app.post("/verify-seller", verifyJWT, verifyAdmin, async (req, res) => {
   const email = req.query.email;
+
   const update = {
     $set: { verified: true },
   };
+
   const result = await UsersCollection.updateOne({ email: email }, update, {
     upsert: true,
   });
+
+  const getSellerProducts = await ProductsCollection.find({
+    sellerEmail: email,
+  }).toArray();
+
+  const updateMany = await ProductsCollection.updateMany(
+    {
+      sellerEmail: email,
+    },
+    {
+      $set: { verified: true },
+    },
+    {
+      upsert: true,
+    }
+  );
   res.send(result);
 });
 
@@ -249,7 +267,7 @@ app.get("/reported-items", async (req, res) => {
 app.delete("/delete-report", verifyJWT, verifyAdmin, async (req, res) => {
   const id = req.query.id;
   const result = await ReportedItemsCollection.deleteOne({ id: id });
-  
+
   const deleteFromProductCollection = await ProductsCollection.deleteOne({
     _id: ObjectId(id),
   });
