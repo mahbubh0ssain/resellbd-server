@@ -265,7 +265,7 @@ app.post("/reported-items", async (req, res) => {
 });
 
 //get reported items
-app.get("/reported-items", async (req, res) => {
+app.get("/reported-items", verifyJWT, verifyAdmin, async (req, res) => {
   const result = await ReportedItemsCollection.find({}).toArray();
   res.send(result);
 });
