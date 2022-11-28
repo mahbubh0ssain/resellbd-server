@@ -235,7 +235,10 @@ app.get("/category", async (req, res) => {
 //get all products
 app.get("/products/:id", async (req, res) => {
   const { id } = req.params;
-  const result = await ProductsCollection.find({ categoryId: id }).toArray();
+  const result = await ProductsCollection.find({
+    categoryId: id,
+    status: "unsold",
+  }).toArray();
   res.send(result);
 });
 
